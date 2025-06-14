@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تمرين الكتابة السريعة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #1e2127;
+            --container-dark: #282c34;
+            --text-primary: #abb2bf;
+            --text-faint: #5c6370;
+            --primary-accent: #61afef;
+            --correct-color: #98c379;
+            --incorrect-color: #e06c75;
+        }
+        @keyframes blink-bg {
+            50% { background-color: #4a505c; }
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s;
+        }
+        .main-container {
+            width: 90%;
+            max-width: 900px;
+            background: var(--container-dark);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3c4049;
+        }
+        #generator-container {
+            text-align: center;
+            border-bottom: 1px solid var(--text-faint);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        #generator-container h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #fff;
+            font-weight: 700;
+        }
+        .difficulty-btn, #custom-text-btn, #start-custom-btn {
+            padding: 10px 18px;
+            font-size: 14px;
+            font-family: 'Cairo', sans-serif;
+            cursor: pointer;
+            border-radius: 8px;
+            border: 1px solid #4b5263;
+            background-color: #3a3f4b;
+            color: var(--text-primary);
+            margin: 5px;
+            transition: all 0.2s ease-in-out;
+        }
+        .difficulty-btn:hover, #custom-text-btn:hover, #start-custom-btn:hover {
+            background-color: var(--primary-accent);
+            border-color: var(--primary-accent);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(97, 175, 239, 0.2);
+        }
+        #custom-text-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #21252b;
+            border-radius: 8px;
+        }
+        #custom-textarea {
+            width: 95%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Cairo', sans-serif;
+            border-radius: 5px;
+            border: 1px solid #4b5263;
+            background-color: #282c34;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        #custom-textarea:focus {
+            outline: none;
+            border-color: var(--primary-accent);
+        }
+        .hidden {
+            display: none;
+        }
+        #stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #21252b;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        #stats-container div {
+            text-align: center;
+            color: #fff;
+        }
+        #stats-container span {
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--primary-accent);
+            min-width: 40px;
+            display: inline-block;
+        }
+        #text-display {
+            font-size: 28px;
+            line-height: 2;
+            letter-spacing: 2px;
+            background-color: #21252b;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 150px;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+        .char { 
+            color: var(--text-faint);
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        .char.correct { 
+            color: var(--correct-color);
+            font-weight: 700;
+        }
+        .char.incorrect { 
+            color: var(--incorrect-color); 
+            background-color: rgba(224, 108, 117, 0.15);
+            text-decoration: underline;
+        }
+        .char.active {
+            border-radius: 3px;
+            animation: blink-bg 1s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div id="generator-container">
+        <h3>أنشئ تمريناً جديداً</h3>
+        <button class="difficulty-btn" data-difficulty="easy">سهل</button>
+        <button class="difficulty-btn" data-difficulty="medium">متوسط</button>
+        <button class="difficulty-btn" data-difficulty="mediumFormatted">متوسط (مع تشكيل)</button>
+        <button class="difficulty-btn" data-difficulty="hard">صعب</button>
+        <button class="difficulty-btn" data-difficulty="hardFormatted">صعب (مع تشكيل)</button>
+        <button id="custom-text-btn">نص مخصص</button>
+    </div>
+    
+    <div id="custom-text-container" class="hidden">
+        <textarea id="custom-textarea" placeholder="ضع النص الذي تريد التدرب عليه هنا..."></textarea>
+        <button id="start-custom-btn">ابدأ التمرين</button>
+    </div>
+
+    <div id="stats-container">
+        <div>السرعة<br><span id="wpm">0</span></div>
+        <div>الدقة<br><span id="accuracy">100</span>%</div>
+        <div>الوقت<br><span id="timer">0</span> ث</div>
+    </div>
+    
+    <div id="text-display">اضغط على أحد الأزرار أعلاه لبدء التمرين...</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const textBank = {
+        easy: ["كان هناك أرنب سريع جداً يتباهى بسرعته أمام السلحفاة البطيئة. قررا أن يتسابقا. نام الأرنب في منتصف الطريق وفازت السلحفاة.","الصدق هو أقصر طريق إلى راحة البال. كن صادقاً في أقوالك وأفعالك دائماً. القليل من الصدق خير من الكثير من الكلام المعسول."],
+        medium: ["في عالم التكنولوجيا، يتغير كل شيء بسرعة فائقة. ما كان يعتبر ابتكاراً بالأمس، قد يصبح قديماً اليوم. لذلك، يجب على الإنسان أن يظل متعلماً ومطلعاً على كل جديد حتى لا يفوته قطار التقدم والتطور المستمر في مجتمعه.","تعتبر القراءة نافذة نطل بها على عوالم لم نرها وأزمنة لم نعشها. إنها توسع مداركنا وتثري مفرداتنا وتصقل شخصياتنا. اجعل الكتاب صديقك الدائم في كل مراحل حياتك."],
+        mediumFormatted: ["يُعَدُّ الْعِلْمُ نُورًا يُضِيءُ لِلْإِنْسَانِ طَرِيقَهُ، وَيَهْدِيهِ إِلَى سُبُلِ الْخَيْرِ وَالرَّشَادِ. بِالْعِلْمِ تَرْتَقِي الْأُمَمُ، وَتَبْنِي حَضَارَاتِهَا الْعَظِيمَةَ. فَاحْرِصْ، يَا بُنَيَّ، عَلَى طَلَبِ الْعِلْمِ.","الصِّدْقُ مَنْجَاةٌ، وَالْكَذِبُ مَهْوَاةٌ. قَدْ يَحْسَبُ الْكَإذِبُ أَنَّهُ يُنْقِذُ نَفْسَهُ، وَلَكِنَّ حَبْلَ الْكَذِبِ قَصِيرٌ. أَمَّا الصَّادِقُ، فَهُوَ مُطْمَئِنُّ الْبَالِ، وَاثِقُ الْخُطَى."],
+        hard: ["تاريخ البشرية هو قصة طويلة من الصراع والتحدي، ولكنه أيضاً قصة من الإبداع والابتكار الذي لا ينضب. منذ أن أشعل الإنسان ناره الأولى ورسم على جدران الكهوف، وهو يسعى جاهداً لفهم العالم من حوله وتسخير الطبيعة لخدمته. مرت الحضارات كالأمواج، ترتفع لتصل إلى قمم المجد ثم تنحسر تاركة وراءها آثاراً تدل على عظمتها من أهرامات شاهقة إلى مخطوطات نادرة. إن دراسة هذا التاريخ تعلمنا أن التقدم لم يكن يوماً سهلاً، بل كان ثمرة لجهود أجيال متواصلة من المفكرين والعمال والفنانين الذين آمنوا بمستقبل أفضل.","تعد الاستدامة البيئية واحدة من أكبر التحديات التي تواجه عالمنا المعاصر. إن النمو الصناعي والسكاني الهائل قد وضع ضغوطاً غير مسبوقة على موارد كوكبنا المحدودة، من المياه العذبة والغابات إلى الهواء النقي الذي نتنفسه. لم يعد من الممكن تجاهل عواقب أفعالنا، مثل تغير المناخ وفقدان التنوع البيولوجي. يتطلب الأمر تحولاً جذرياً في طريقة تفكيرنا وسلوكنا، بالانتقال من نموذج الاستهلاك الخطي إلى نموذج الاقتصاد الدائري الذي يركز على إعادة الاستخدام والتدوير وتقليل النفايات إلى الحد الأدنى. إنها مسؤولية جماعية تقع على عاتق الحكومات والشركات والأفراد على حد سواء."],
+        hardFormatted: ["الْلُّغَةُ الْعَرَبِيَّةُ بَحْرٌ عَمِيقٌ، لَا يَصِلُ إِلَى قَعْرِهِ إِلَّا الْغَوَّاصُونَ الْمَاهِرُونَ. تَزْخَرُ بِمُفْرَدَاتٍ ثَرِيَّةٍ وَتَرَاكِيبَ بَلَاغِيَّةٍ أَخَّاذَةٍ، وَتَتَمَيَّزُ بِقُدْرَتِهَا الْفَائِقَةِ عَلَى الْتَّعْبِيرِ عَنْ أَدَقِّ الْأَفْكَارِ وَأَرْقَى الْمَشَاعِرِ. إِنَّ إِتْقَانَهَا لَيْسَ مُجَرَّدَ مَهَارَةٍ لُغَوِيَّةٍ، بَلْ هُوَ غَوْصٌ فِي تَارِيخٍ عَظِيمٍ وَثَقَافَةٍ أَصِيلَةٍ. فَالْحَرْفُ الْعَرَبِيُّ يَحْمِلُ فِي طَيَّاتِهِ إِرْثًا يَمْتَدُّ لِقُرُونٍ طَوِيلَةٍ، مِنَ الشِّعْرِ الْجَاهِلِيِّ الْفَصِيحِ إِلَى آيَاتِ الْقُرْآنِ الْكَرِيمِ الْبَيِّنَةِ، مِمَّا يَجْعَلُهَا لُغَةً حَيَّةً تَنْبِضُ بِالْجَمَالِ وَالْجَلَالِ.","الْأَمَانَةُ خُلُقٌ عَظِيمٌ وَرُكْنٌ أَسَاسِيٌّ فِي بِنَاءِ الْمُجْتَمَعَاتِ الْمُتَمَاسِكَةِ. لَيْسَتِ الْأَمَانَةُ مُقْتَصِرَةً عَلَى حِفْظِ الْوَدَائِعِ الْمَالِيَّةِ فَحَسْبُ، بَلْ تَتَعَدَّاهَا لِتَشْمَلَ الْإِخْلَاصَ فِي الْعَمَلِ، وَالْصِّدْقَ فِي الْقَوْلِ، وَالْحِفَاظَ عَلَى الْأَسْرَارِ، وَأَدَاءَ كُلِّ حَقٍّ إِلَى صَاحِبِهِ. إِنَّ الْإِنْسَانَ الْأَمِينَ هُوَ شَخْصٌ مَوْثُوقٌ بِهِ، يَطْمَئِنُّ النَّاسُ إِلَيْهِ وَيَعْتَمِدُونَ عَلَيْهِ فِي شُؤُونِهِمُ الْهَامَّةِ. وَبِدُونِ الْأَمَانَةِ، تَسُودُ الْفَوْضَى وَيَنْعَدِمُ الْاسْتِقْرَارُ، وَتَتَفَكَّكُ أَوْصَالُ الثِّقَةِ بَيْنَ أَفْرَادِ الْأُمَّةِ الْوَاحِدَةِ."]
+    };
+
+    const textDisplayEl = document.getElementById('text-display');
+    const wpmEl = document.getElementById('wpm');
+    const accuracyEl = document.getElementById('accuracy');
+    const timerEl = document.getElementById('timer');
+    const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+    const customTextBtn = document.getElementById('custom-text-btn');
+    const customTextContainer = document.getElementById('custom-text-container');
+    const customTextarea = document.getElementById('custom-textarea');
+    const startCustomBtn = document.getElementById('start-custom-btn');
+
+    let currentIndex = 0;
+    let correctChars = 0;
+    let totalTyped = 0;
+    let timerInterval;
+    let startTime;
+    
+    difficultyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            customTextContainer.classList.add('hidden');
+            const difficulty = button.dataset.difficulty;
+            const texts = textBank[difficulty];
+            const currentText = texts[Math.floor(Math.random() * texts.length)];
+            loadText(currentText);
+        });
+    });
+
+    customTextBtn.addEventListener('click', () => {
+        customTextContainer.classList.toggle('hidden');
+    });
+
+    startCustomBtn.addEventListener('click', () => {
+        const customText = customTextarea.value;
+        if (customText.trim() !== "") {
+            loadText(customText);
+            customTextContainer.classList.add('hidden');
+        } else {
+            alert("الرجاء إدخال نص للتدرب عليه.");
+        }
+    });
+
+    function loadText(text) {
+        resetState();
+        textDisplayEl.innerHTML = '';
+        text.split('').forEach(char => {
+            const charSpan = document.createElement('span');
+            charSpan.innerText = char;
+            charSpan.classList.add('char');
+            textDisplayEl.appendChild(charSpan);
+        });
+        if (text.length > 0) {
+            textDisplayEl.querySelectorAll('.char')[0].classList.add('active');
+            document.addEventListener('keydown', handleTyping);
+        }
+    }
+
+    function resetState() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        currentIndex = 0;
+        correctChars = 0;
+        totalTyped = 0;
+        wpmEl.textContent = '0';
+        accuracyEl.textContent = '100';
+        timerEl.textContent = '0';
+        document.removeEventListener('keydown', handleTyping);
+    }
+
+    function handleTyping(e) {
+        if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'Backspace') return;
+        
+        const charSpans = textDisplayEl.querySelectorAll('.char');
+        if (currentIndex >= charSpans.length) return;
+
+        if (!timerInterval && totalTyped === 0) {
+            startTime = new Date();
+            timerInterval = setInterval(updateStats, 1000);
+        }
+        
+        charSpans[currentIndex].classList.remove('active');
+        totalTyped++;
+        
+        if (e.key === charSpans[currentIndex].innerText) {
+            charSpans[currentIndex].classList.add('correct');
+            correctChars++;
+        } else {
+            if (e.key === " " && charSpans[currentIndex].innerText !== " "){
+                 totalTyped--;
+                 return;
+            }
+            charSpans[currentIndex].classList.add('incorrect');
+        }
+
+        currentIndex++;
+        updateStats();
+
+        if (currentIndex === charSpans.length) {
+            clearInterval(timerInterval);
+        } else {
+            charSpans[currentIndex].classList.add('active');
+        }
+    }
+
+    function updateStats() {
+        const elapsedTime = startTime ? (new Date() - startTime) / 1000 : 0;
+        timerEl.textContent = Math.floor(elapsedTime);
+        
+        const minutes = elapsedTime / 60;
+        const wpm = minutes > 0 ? Math.round((correctChars / 5) / minutes) : 0;
+        wpmEl.textContent = wpm;
+
+        const accuracy = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
+        accuracyEl.textContent = accuracy;
+    }
+});
+</script>
+
+</body>
+</html>
