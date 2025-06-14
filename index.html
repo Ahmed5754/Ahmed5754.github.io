@@ -17,6 +17,7 @@
             --primary-accent: #52a3dd;
             --correct-color: #7acc7a;
             --incorrect-color: #e0707c;
+            --highlight-color: #ffc107;
         }
         @keyframes gradient-animation {
             0% { background-position: 0% 50%; }
@@ -40,7 +41,6 @@
             background: linear-gradient(-45deg, var(--bg-dark-1), var(--bg-dark-2), #2a3a46, #1c2a34);
             background-size: 400% 400%;
             animation: gradient-animation 25s ease infinite;
-            transition: background-color 0.3s;
         }
         .main-container {
             width: 90%;
@@ -72,9 +72,12 @@
         #custom-textarea:focus { outline: none; border-color: var(--primary-accent); }
         .hidden { display: none !important; }
         
-        #stats-container { display: flex; justify-content: space-around; margin-bottom: 25px; padding: 15px; background: #212a30; border-radius: 8px; font-size: 18px; }
-        #stats-container div { text-align: center; color: #fff; }
+        #stats-container { display: flex; flex-wrap: wrap; justify-content: space-around; margin-bottom: 15px; padding: 10px; background: #212a30; border-radius: 8px; font-size: 18px; }
+        #stats-container > div { text-align: center; color: #fff; padding: 5px 10px;}
         #stats-container span { font-weight: 700; font-size: 24px; color: var(--primary-accent); min-width: 40px; display: inline-block; }
+        
+        #high-score-display { width: 100%; text-align: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--text-faint); font-size: 16px; color: var(--highlight-color); }
+        #high-score-display span { color: #fff; }
         
         #text-display-wrapper { position: relative; }
         #text-display { font-size: 32px; line-height: 2.2; letter-spacing: 2px; background-color: #212a30; padding: 25px; border-radius: 8px; min-height: 180px; margin-bottom: 20px; text-align: justify; }
@@ -84,28 +87,21 @@
         .char.incorrect { color: var(--incorrect-color); background-color: rgba(224, 112, 124, 0.15); }
         .char.active { background-color: var(--text-faint); border-radius: 3px; color: var(--container-dark); }
 
-        #countdown-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(28, 38, 44, 0.95); z-index: 10;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 120px; color: var(--primary-accent); font-weight: 700;
-            border-radius: 15px;
-        }
-        #retry-btn { margin: 0 auto; font-size: 16px; }
+        #countdown-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(28, 38, 44, 0.95); z-index: 10; display: flex; justify-content: center; align-items: center; font-size: 120px; color: var(--primary-accent); font-weight: 700; border-radius: 15px; }
+        #retry-btn { margin: 10px auto 0; font-size: 16px; }
         
+        #error-analysis-display { margin-top: 20px; padding: 15px; background-color: #212a30; border-radius: 8px; }
+        #error-analysis-display h4 { margin: 0 0 10px 0; text-align: center; color: var(--highlight-color); }
+        #error-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .error-item { background-color: #3a454f; padding: 5px 10px; border-radius: 5px; font-size: 16px; }
+        .error-item .char-name { font-weight: bold; color: var(--incorrect-color); font-size: 20px; }
     </style>
 </head>
 <body>
 
 <div class="main-container">
     <div id="generator-container">
-         <h3>أنشئ تمريناً جديداً</h3>
-        <button class="difficulty-btn" data-difficulty="easy"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>سهل</button>
-        <button class="difficulty-btn" data-difficulty="medium"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.35 7.16h7.65l-6.18 4.48 2.35 7.16-6.17-4.48-6.17 4.48 2.35-7.16-6.18-4.48h7.65z"/></svg>متوسط</button>
-        <button class="difficulty-btn" data-difficulty="hard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>صعب</button>
-        <button class="difficulty-btn" data-difficulty="mediumFormatted"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>مع تشكيل</button>
-        <button id="custom-text-btn" class="difficulty-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>نص مخصص</button>
-    </div>
+         </div>
 
     <div id="custom-text-container" class="hidden">
         <textarea id="custom-textarea" placeholder="ضع النص الذي تريد التدرب عليه هنا..."></textarea>
@@ -116,6 +112,9 @@
         <div>السرعة<br><span id="wpm">0</span></div>
         <div>الدقة<br><span id="accuracy">100</span>%</div>
         <div>الوقت<br><span id="timer">0</span> ث</div>
+        <div id="high-score-display" class="hidden">
+            أفضل نتيجة: <span id="best-wpm">0</span> ك/د | <span id="best-accuracy">100</span>%
+        </div>
     </div>
     
     <div id="text-display-wrapper">
@@ -123,40 +122,114 @@
             <span id="countdown-text">3</span>
         </div>
         <div id="text-display">اضغط على أحد الأزرار أعلاه لبدء التمرين...</div>
-        <button id="retry-btn" class="hidden">
-            إعادة التمرين
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/></svg>
-        </button>
+        <div style="text-align: center;">
+            <button id="retry-btn" class="hidden">
+                إعادة التمرين
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M21 21v-5h-5"/></svg>
+            </button>
+        </div>
+        <div id="error-analysis-display" class="hidden">
+            <h4>أكثر الأخطاء شيوعاً</h4>
+            <div id="error-list"></div>
+        </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const textBank = {
-        easy: ["كان هناك أرنب سريع جداً يتباهى بسرعته أمام السلحفاة البطيئة. قررا أن يتسابقا. نام الأرنب في منتصف الطريق وفازت السلحفاة.","الصدق هو أقصر طريق إلى راحة البال. كن صادقاً في أقوالك وأفعالك دائماً. القليل من الصدق خير من الكثير من الكلام المعسول."],
-        medium: ["في عالم التكنولوجيا، يتغير كل شيء بسرعة فائقة. ما كان يعتبر ابتكاراً بالأمس، قد يصبح قديماً اليوم. لذلك، يجب على الإنسان أن يظل متعلماً ومطلعاً على كل جديد حتى لا يفوته قطار التقدم والتطور المستمر في مجتمعه.","تعتبر القراءة نافذة نطل بها على عوالم لم نرها وأزمنة لم نعشها. إنها توسع مداركنا وتثري مفرداتنا وتصقل شخصياتنا. اجعل الكتاب صديقك الدائم في كل مراحل حياتك."],
-        mediumFormatted: ["يُعَدُّ الْعِلْمُ نُورًا يُضِيءُ لِلْإِنْسَانِ طَرِيقَهُ، وَيَهْدِيهِ إِلَى سُبُلِ الْخَيْرِ وَالرَّشَادِ. بِالْعِلْمِ تَرْتَقِي الْأُمَمُ، وَتَبْنِي حَضَارَاتِهَا الْعَظِيمَةَ. فَاحْرِصْ، يَا بُنَيَّ، عَلَى طَلَبِ الْعِلْمِ.","الصِّدْقُ مَنْجَاةٌ، وَالْكَذِبُ مَهْوَاةٌ. قَدْ يَحْسَبُ الْكَإذِبُ أَنَّهُ يُنْقِذُ نَفْسَهُ، وَلَكِنَّ حَبْلَ الْكَذِبِ قَصِيرٌ. أَمَّا الصَّادِقُ، فَهُوَ مُطْمَئِنُّ الْبَالِ، وَاثِقُ الْخُطَى."],
-        hard: ["تاريخ البشرية هو قصة طويلة من الصراع والتحدي، ولكنه أيضاً قصة من الإبداع والابتكار الذي لا ينضب. منذ أن أشعل الإنسان ناره الأولى ورسم على جدران الكهوف، وهو يسعى جاهداً لفهم العالم من حوله وتسخير الطبيعة لخدمته. مرت الحضارات كالأمواج، ترتفع لتصل إلى قمم المجد ثم تنحسر تاركة وراءها آثاراً تدل على عظمتها من أهرامات شاهقة إلى مخطوطات نادرة. إن دراسة هذا التاريخ تعلمنا أن التقدم لم يكن يوماً سهلاً، بل كان ثمرة لجهود أجيال متواصلة من المفكرين والعمال والفنانين الذين آمنوا بمستقبل أفضل.","تعد الاستدامة البيئية واحدة من أكبر التحديات التي تواجه عالمنا المعاصر. إن النمو الصناعي والسكاني الهائل قد وضع ضغوطاً غير مسبوقة على موارد كوكبنا المحدودة، من المياه العذبة والغابات إلى الهواء النقي الذي نتنفسه. لم يعد من الممكن تجاهل عواقب أفعالنا، مثل تغير المناخ وفقدان التنوع البيولوجي. يتطلب الأمر تحولاً جذرياً في طريقة تفكيرنا وسلوكنا، بالانتقال من نموذج الاستهلاك الخطي إلى نموذج الاقتصاد الدائري الذي يركز على إعادة الاستخدام والتدوير وتقليل النفايات إلى الحد الأدنى. إنها مسؤولية جماعية تقع على عاتق الحكومات والشركات والأفراد على حد سواء."],
-        hardFormatted: ["الْلُّغَةُ الْعَرَبِيَّةُ بَحْرٌ عَمِيقٌ، لَا يَصِلُ إِلَى قَعْرِهِ إِلَّا الْغَوَّاصُونَ الْمَاهِرُونَ. تَزْخَرُ بِمُفْرَدَاتٍ ثَرِيَّةٍ وَتَرَاكِيبَ بَلَاغِيَّةٍ أَخَّاذَةٍ، وَتَتَمَيَّزُ بِقُدْرَتِهَا الْفَائِقَةِ عَلَى الْتَّعْبِيرِ عَنْ أَدَقِّ الْأَفْكَارِ وَأَرْقَى الْمَشَاعِرِ. إِنَّ إِتْقَانَهَا لَيْسَ مُجَرَّدَ مَهَارَةٍ لُغَوِيَّةٍ، بَلْ هُوَ غَوْصٌ فِي تَارِيخٍ عَظِيمٍ وَثَقَافَةٍ أَصِيلَةٍ. فَالْحَرْفُ الْعَرَبِيُّ يَحْمِلُ فِي طَيَّاتِهِ إِرْثًا يَمْتَدُّ لِقُرُونٍ طَوِيلَةٍ، مِنَ الشِّعْرِ الْجَاهِلِيِّ الْفَصِيحِ إِلَى آيَاتِ الْقُرْآنِ الْكَرِيمِ الْبَيِّنَةِ، مِمَّا يَجْعَلُهَا لُغَةً حَيَّةً تَنْبِضُ بِالْجَمَالِ وَالْجَلَالِ.","الْأَمَانَةُ خُلُقٌ عَظِيمٌ وَرُكْنٌ أَسَاسِيٌّ فِي بِنَاءِ الْمُجْتَمَعَاتِ الْمُتَمَاسِكَةِ. لَيْسَتِ الْأَمَانَةُ مُقْتَصِرَةً عَلَى حِفْظِ الْوَدَائِعِ الْمَالِيَّةِ فَحَسْبُ، بَلْ تَتَعَدَّاهَا لِتَشْمَلَ الْإِخْلَاصَ فِي الْعَمَلِ، وَالْصِّدْقَ فِي الْقَوْلِ، وَالْحِفَاظَ عَلَى الْأَسْرَارِ، وَأَدَاءَ كُلِّ حَقٍّ إِلَى صَاحِبِهِ. إِنَّ الْإِنْسَانَ الْأَمِينَ هُوَ شَخْصٌ مَوْثُوقٌ بِهِ، يَطْمَئِنُّ النَّاسُ إِلَيْهِ وَيَعْتَمِدُونَ عَلَيْهِ فِي شُؤُونِهِمُ الْهَامَّةِ. وَبِدُونِ الْأَمَانَةِ، تَسُودُ الْفَوْضَى وَيَنْعَدِمُ الْاسْتِقْرَارُ، وَتَتَفَكَّكُ أَوْصَالُ الثِّقَةِ بَيْنَ أَفْرَادِ الْأُمَّةِ الْوَاحِدَةِ."]
+        easy: [
+            "كان النبي محمد صلى الله عليه وسلم معروفاً بصدقه وأمانته منذ صغره، حتى أن أهل مكة كانوا يلقبونه بالصادق الأمين ويأتمنونه على أموالهم.",
+            "يتكون نظامنا الشمسي من الشمس وثمانية كواكب تدور حولها. كوكبنا الأرض هو الكوكب الثالث من حيث البعد عن الشمس، وهو المكان الوحيد الذي نعرف أن به حياة.",
+            "عندما نزل الوحي على الرسول لأول مرة في غار حراء، عاد إلى زوجته خديجة رضي الله عنها خائفاً يرتجف، فطمأنته وقالت له: والله لا يخزيك الله أبداً.",
+            "النجوم التي نراها في الليل هي شموس عملاقة لكنها بعيدة جداً عنا. أقرب نجم إلينا بعد الشمس يسمى بروكسيما سنتوري ويبعد عنا أكثر من أربع سنوات ضوئية.",
+            "من حكمة النبي صلى الله عليه وسلم أنه كان يستشير أصحابه في الأمور الهامة. في معركة أحد، أخذ برأي غالبية الصحابة بالخروج لملاقاة العدو خارج المدينة."
+        ],
+        medium: [
+            "في بداية الدعوة الإسلامية، تحمل المسلمون الأوائل أذى كبيراً من كفار قريش. ورغم التعذيب والاضطهاد، إلا أنهم ثبتوا على دينهم وصبروا إيماناً بالله ورسوله. كان بلال بن رباح مثالاً عظيماً على الصبر، حيث كان يردد 'أحدٌ أحد' وهو تحت العذاب.",
+            "كوكب المشتري هو أكبر كواكب المجموعة الشمسية، وهو عملاق غازي ضخم جداً حتى أنه يمكن أن يتسع لجميع كواكب النظام الشمسي الأخرى بداخله. يتميز ببقعته الحمراء العظيمة، وهي عاصفة هائلة مستمرة منذ مئات السنين وحجمها أكبر من حجم كوكب الأرض.",
+            "كان الرسول صلى الله عليه وسلم رحيماً بالأطفال، يلاعبهم ويمازحهم. مر يوماً بصبي كان له عصفور صغير يلعب به فمات العصفور، فحزن الصبي. فذهب إليه النبي يواسيه ويقول له مازحاً: 'يا أبا عمير، ما فعل النغير؟'.",
+            "مجرة درب التبانة هي مجرتنا التي نعيش فيها، وهي تحتوي على مئات المليارات من النجوم، بما في ذلك شمسنا. تبدو في السماء كشريط لبني باهت، ومن هنا جاء اسمها. يستغرق الضوء حوالي مئة ألف سنة ليعبر المجرة من طرف إلى آخر.",
+            "في صلح الحديبية، وافق النبي صلى الله عليه وسلم على شروط قد تبدو في ظاهرها مجحفة للمسلمين، لكنها كانت نظرة استراتيجية بعيدة المدى. هذا الصلح كان سبباً في دخول أعداد كبيرة من الناس في الإسلام وأدى في النهاية إلى فتح مكة بدون قتال."
+        ],
+        mediumFormatted: [
+            "مِنْ أَعْظَمِ صِفَاتِ النَّبِيِّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ حِلْمُهُ وَعَفْوُهُ عَمَّنْ أَسَاءَ إِلَيْهِ. فَيَوْمَ فَتْحِ مَكَّةَ، دَخَلَهَا مُنْتَصِرًا، وَقَدْ كَانَ أَهْلُهَا هُمُ الَّذِينَ آذَوْهُ وَأَخْرَجُوهُ مِنْهَا. لَكِنَّهُ لَمْ يَنْتَقِمْ، بَلْ قَالَ لَهُمْ: 'اذْهَبُوا فَأَنْتُمُ الطُّلَقَاءُ'.",
+            "الْقَمَرُ هُوَ الْجِسْمُ الْفَلَكِيُّ الْوَحِيدُ الَّذِي هَبَطَ عَلَيْهِ الْبَشَرُ. سَطْحُهُ صَخْرِيٌّ وَمَلِيءٌ بِالْفُوَّهَاتِ النَّاتِجَةِ عَنِ اصْطِدَامِ النَّيَازِكِ بِهِ عَلَى مَدَى مَلَايِينِ السنينَ. لَا يُوجَدُ لَهُ غِلَافٌ جَوِيٌّ، لِذَلِكَ تَتَفَاوَتُ دَرَجَةُ حَرَارَتِهِ بِشَكْلٍ كَبِيرٍ جِدًّا بَيْنَ النَّهَارِ وَاللَّيْلِ.",
+            "كَانَ النَّبِيُّ يَقُومُ اللَّيْلَ حَتَّى تَتَوَرَّمَ قَدَمَاهُ، فَتَقُولُ لَهُ عَائِشَةُ رَضِيَ اللهُ عَنْهَا: لِمَ تَصْنَعُ هَذَا يَا رَسُولَ اللهِ وَقَدْ غَفَرَ اللهُ لَكَ مَا تَقَدَّمَ مِنْ ذَنْبِكَ وَمَا تَأَخَّرَ؟ فَيَقُولُ: 'أَفَلَا أَكُونُ عَبْدًا شَكُورًا؟'.",
+            "نَجَمُ الشِّعْرَى الْيَمَانِيَّةُ (Sirius) هُوَ أَلْمَعُ نَجْمٍ فِي سَمَاءِ اللَّيْلِ. هُوَ فِي الْوَاقِعِ نِظَامٌ نَجْمِيٌّ ثُنَائِيٌّ يَتَكَوَّنُ مِنْ نَجْمٍ أَبْيَضَ مُزْرَقٍّ يُسَمَّى 'الشِّعْرَى أ'، وَقَزَمٍ أَبْيَضَ خَافِتٍ يُسَمَّى 'الشِّعْرَى ب'.",
+            "الزَّكَاةُ رُكْنٌ أَسَاسِيٌّ مِنْ أَرْكَانِ الْإِسْلَامِ، وَهِيَ حَقٌّ لِلْفُقَرَاءِ وَالْمَسَاكِينِ فِي أَمْوَالِ الْأَغْنِيَاءِ. إِنَّهَا تُطَهِّرُ النُّفُوسَ مِنَ الشُّحِّ وَالْبُخْلِ، وَتُحَقِّقُ التَّكَافُلَ وَالتَّرَاحُمَ فِي الْمُجْتَمَعِ الْمُسْلِمِ."
+        ],
+        hard: [
+            "كانت هجرة الرسول صلى الله عليه وسلم من مكة إلى المدينة حدثاً محورياً في تاريخ الإسلام، ولم تكن مجرد انتقال، بل كانت تخطيطاً دقيقاً وعملاً متقناً اعتمد على التوكل على الله والأخذ بالأسباب. اختار النبي رفيقاً هو أبو بكر الصديق، ودليلاً خبيراً بالطرق هو عبد الله بن أريقط. اختبأ في غار ثور لثلاث ليالٍ بينما كان الكفار يبحثون عنه في كل مكان، وكانت أسماء بنت أبي بكر تأتيهما بالطعام، وكان أخوها عبد الله يأتيهما بأخبار قريش. هذا التخطيط المحكم يعلمنا أهمية الإعداد والتنظيم في تحقيق أعظم الأهداف.",
+            "الثقوب السوداء هي من أكثر الظواهر غموضاً وإثارة في الكون. إنها منطقة في الفضاء تكون فيها الجاذبية قوية جداً لدرجة أنه لا شيء يمكنه الإفلات منها، ولا حتى الضوء، ولهذا تبدو سوداء. تتكون الثقوب السوداء النجمية عندما تنهار النجوم العملاقة في نهاية حياتها تحت تأثير جاذبيتها الخاصة. في مركز كل ثقب أسود توجد نقطة تسمى 'التفرد' (Singularity)، وهي نقطة ذات كثافة لا نهائية وحجم متناهي الصغر، تنهار فيها قوانين الفيزياء التي نعرفها.",
+            "كانت حجة الوداع هي الحجة الوحيدة التي حجها النبي صلى الله عليه وسلم بعد الهجرة. في هذه الحجة، ألقى خطبته الشهيرة التي أرسى فيها قواعد الإسلام ومبادئه الأساسية. أكد على حرمة الدماء والأموال والأعراض، وأوصى بالنساء خيراً، وأعلن اكتمال الدين وتمام النعمة. كانت كلماته بمثابة وصية شاملة للأمة الإسلامية، تلخص رسالته التي استمرت لثلاثة وعشرين عاماً، وتحدد معالم الطريق للأجيال القادمة.",
+            "السديم هو سحابة ضخمة من الغبار والغاز، خاصة الهيدروجين والهيليوم، تتواجد في الفضاء بين النجوم. السدم هي في الأساس 'حضانات' النجوم، حيث تتشكل النجوم الجديدة من خلال عملية تسمى الانهيار الجذبوي. عندما تتجمع كمية كافية من المادة في جزء من السحابة، تبدأ جاذبيتها في سحب المزيد من الغبار والغاز نحوها، مما يزيد من كثافتها وحرارتها حتى تشتعل وتولد نجماً جديداً. سديم الجبار هو أحد أشهر الأمثلة التي يمكن رؤيتها.",
+            "كان عمر بن الخطاب رضي الله عنه مثالاً فريداً في العدل والزهد. على الرغم من أنه كان خليفةً لدولة إسلامية تمتد على مساحات شاسعة، إلا أنه كان يعيش حياة بسيطة للغاية. من أشهر قصصه أنه كان نائماً تحت شجرة عندما رآه رسول قيصر، فتعجب من حاله وقال قولته الشهيرة: 'حكمت فعدلت فأمنت فنمت يا عمر'. هذه القصة تظهر كيف أن العدل الحقيقي هو أساس الأمن والاستقرار في أي دولة."
+        ],
+        hardFormatted: [
+            "بُعِثَ النَّبِيُّ مُحَمَّدٌ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ رَحْمَةً لِلْعَالَمِينَ، وَكَانَتْ أَخْلَاقُهُ هِيَ الْقُرْآنَ يَمْشِي عَلَى الْأَرْضِ. لَقَدْ جَسَّدَ أَعْلَى مَعَانِي الْإِنْسَانِيَّةِ فِي تَعَامُلِهِ مَعَ الْجَمِيعِ؛ فَقَدْ كَانَ يُكْرِمُ الْجَارَ، وَيَصِلُ الرَّحِمَ، وَيَحْمِلُ الْكَلَّ (أَيْ يُعِينُ الضَّعِيفَ)، وَيُعينُ عَلَى نَوَائِبِ الْحَقِّ. لَمْ يَكُنْ فَظًّا وَلَا غَلِيظَ الْقَلْبِ، بَلْ كَانَ لَيِّنَ الْجَانِبِ، سَمْحًا إِذَا بَاعَ وَإِذَا اشْتَرَى، وَكَانَ أَشَدَّ حَيَاءً مِنَ الْعَذْرَاءِ فِي خِدْرِهَا. هَذِهِ الْأَخْلَاقُ السَّامِيَةُ هِيَ مَا جَذَبَ النَّاسَ إِلَى دِينِهِ وَجَعَلَهُمْ يُحِبُّونَهُ أَكْثَرَ مِنْ أَنْفُسِهِمْ.",
+            "تُعْتَبَرُ النَّظَرِيَّةُ النِّسْبِيَّةُ الَّتِي وَضَعَهَا أَلْبِرْت أَيْنْشْتَايْن مِنْ أَهَمِّ الْإِنْجَازَاتِ الْفِكْرِيَّةِ فِي الْقَرْنِ الْعِشْرِينَ. تَتَكَوَّنُ النَّظَرِيَّةُ مِنْ جُزْأَيْنِ: النِّسْبِيَّةُ الْخَاصَّةُ وَالنِّسْبِيَّةُ الْعَامَّةُ. تُغَيِّرُ النِّسْبِيَّةُ مَفَاهِيمَنَا الْأَسَاسِيَّةَ عَنِ الزَّمَانِ وَالْمَكَانِ، حَيْثُ أَظْهَرَتْ أَنَّهُمَا لَيْسَا مُطْلَقَيْنِ، بَلْ يَعْتَمِدَانِ عَلَى حَرَكَةِ الْمُرَاقِبِ. مِنْ أَشْهَرِ نَتَائِجِهَا الْمُعَادَلَةُ الشَّهِيرَةُ $E=mc^2$، الَّتِي تَرْبِطُ بَيْنَ الطَّاقَةِ (E) وَالْكُتْلَةِ (m)، وَتُشِيرُ إِلَى أَنَّ كَمِّيَّةً صَغِيرَةً مِنَ الْكُتْلَةِ يُمْكِنُ أَنْ تَتَحَوَّلَ إِلَى كَمِّيَّةٍ هَائِلَةٍ مِنَ الطَّاقَةِ.",
+            "إِنَّ جَمْعَ الْقُرْآنِ الْكَرِيمِ فِي مُصْحَفٍ وَاحِدٍ مَرَّ بِمَرَاحِلَ دَقِيقَةٍ لِضَمَانِ حِفْظِهِ كَمَا أُنْزِلَ. بَدَأَ الْأَمْرُ فِي عَهْدِ الْخَلِيفَةِ أَبِي بَكْرٍ الصِّدِّيقِ رَضِيَ اللهُ عَنْهُ، بَعْدَ اسْتِشْهَادِ عَدَدٍ كَبِيرٍ مِنْ حَفَظَةِ الْقُرْآنِ فِي مَعْرَكَةِ الْيَمَامَةِ. فَأَشَارَ عَلَيْهِ عُمَرُ بْنُ الْخَطَّابِ بِجَمْعِ الْقُرْآنِ، فَتَرَدَّدَ أَبُو بَكْرٍ فِي الْبِدَايَةِ ثُمَّ شَرَحَ اللهُ صَدْرَهُ لِذَلِكَ. فَكَلَّفَ زَيْدَ بْنَ ثَابِتٍ بِالْمُهِمَّةِ، وَكَانَ زَيْدٌ يَتَتَبَّعُ الْقُرْآنَ فَيَجْمَعُهُ مِنَ الْعُسُبِ وَاللِّخَافِ وَصُدُورِ الرِّجَالِ.",
+            "الْمَادَّةُ الْمُظْلِمَةُ وَالطَّاقَةُ الْمُظْلِمَةُ تُشَكِّلَانِ حَوَالَيْ خَمْسَةٍ وَتِسْعِينَ بِالْمِائَةِ مِنْ كَوْنِنَا، وَلَكِنَّنَا لَا نَعْرِفُ عَنْهُمَا شَيْئًا تَقْرِيبًا. الْمَادَّةُ الْمُظْلِمَةُ لَا تَتَفَاعَلُ مَعَ الضَّوْءِ، لِذَا لَا يُمْكِنُ رُؤْيَتُهَا، وَلَكِنَّ الْعُلَمَاءَ يَسْتَدِلُّونَ عَلَى وُجُودِهَا مِنْ خِلَالِ تَأْثِيرِ جَاذِبِيَّتِهَا عَلَى حَرَكَةِ النُّجُومِ وَالْمَجَرَّاتِ. أَمَّا الطَّاقَةُ الْمُظْلِمَةُ، فَهِيَ قُوَّةٌ غَامِضَةٌ يُعْتَقَدُ أَنَّهَا الْمَسْؤُولَةُ عَنِ التَّوَسُّعِ الْمُتَسَارِعِ لِلْكَوْنِ.",
+            "مِنْ جَوَامِعِ كَلِمِ النَّبِيِّ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ قَوْلُهُ: 'احْفَظِ اللهَ يَحْفَظْكَ، احْفَظِ اللهَ تَجِدْهُ تُجَاهَكَ'. هَذِهِ الْوَصِيَّةُ الْجَامِعَةُ تُعَلِّمُنَا أَنَّ حِفْظَ حُدُودِ اللهِ وَامْتِثَالَ أَوَامِرِهِ هُوَ سَبَبُ حِفْظِ اللهِ لِلْعَبْدِ فِي دِينِهِ وَدُنْيَاهُ وَصِحَّتِهِ وَأَهْلِهِ وَمَالِهِ. وَأَنَّ مَنْ كَانَ اللهُ مَعَهُ، فَمِمَّنْ يَخَافُ وَمَنْ يَرْجُو؟ إِنَّهَا قَاعِدَةٌ لِلطُّمَأْنِينَةِ وَالثِّقَةِ بِاللهِ فِي كُلِّ الْأَحْوَالِ."
+        ]
     };
     
+    // Elements
     const textDisplayEl = document.getElementById('text-display');
     const wpmEl = document.getElementById('wpm');
     const accuracyEl = document.getElementById('accuracy');
     const timerEl = document.getElementById('timer');
+    const generatorContainer = document.getElementById('generator-container');
     const customTextContainer = document.getElementById('custom-text-container');
     const customTextarea = document.getElementById('custom-textarea');
+    const startCustomBtn = document.getElementById('start-custom-btn');
     const countdownOverlay = document.getElementById('countdown-overlay');
     const countdownTextEl = document.getElementById('countdown-text');
     const retryBtn = document.getElementById('retry-btn');
+    const highScoreDisplay = document.getElementById('high-score-display');
+    const bestWpmEl = document.getElementById('best-wpm');
+    const bestAccuracyEl = document.getElementById('best-accuracy');
+    const errorAnalysisDisplay = document.getElementById('error-analysis-display');
+    const errorListEl = document.getElementById('error-list');
 
+    // State
     let currentIndex = 0;
     let correctChars = 0;
     let totalTyped = 0;
     let timerInterval;
     let startTime;
     let currentText = "";
+    let currentTextId = "";
     let isTypingEnabled = false;
+    let errorLog = {};
+    let highScores = {};
+
+    function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem('typingTutorScores')) || {};
+        highScores = settings.highScores || {};
+    }
+    loadSettings();
+
+    function saveHighScores() {
+        const settings = { highScores: highScores };
+        localStorage.setItem('typingTutorScores', JSON.stringify(settings));
+    }
+
+    const buttonConfig = [
+        { id: 'easy', text: 'سهل', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>' },
+        { id: 'medium', text: 'متوسط', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.35 7.16h7.65l-6.18 4.48 2.35 7.16-6.17-4.48-6.17 4.48 2.35-7.16-6.18-4.48h7.65z"/></svg>' },
+        { id: 'hard', text: 'صعب', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>' },
+        { id: 'mediumFormatted', text: 'متوسط (تشكيل)', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>' },
+        { id: 'hardFormatted', text: 'صعب (تشكيل)', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>' },
+    ];
+
+    let buttonsHTML = '<h3>أنشئ تمريناً جديداً</h3>';
+    buttonConfig.forEach(btn => {
+        buttonsHTML += `<button class="difficulty-btn" data-difficulty="${btn.id}">${btn.icon}${btn.text}</button>`;
+    });
+    buttonsHTML += `<button id="custom-text-btn" class="difficulty-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>نص مخصص</button>`;
+    generatorContainer.innerHTML = buttonsHTML;
 
     document.querySelectorAll('.difficulty-btn').forEach(button => {
         button.addEventListener('click', () => {
@@ -166,27 +239,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             const difficulty = button.dataset.difficulty;
-            const texts = textBank[difficulty];
-            currentText = texts[Math.floor(Math.random() * texts.length)];
-            loadText(currentText);
+            const textsForDifficulty = textBank[difficulty];
+            const randomIndex = Math.floor(Math.random() * textsForDifficulty.length);
+            currentText = textsForDifficulty[randomIndex];
+            currentTextId = `${difficulty}-${randomIndex}`;
+            loadText(currentText, currentTextId);
         });
     });
 
-    document.getElementById('start-custom-btn').addEventListener('click', () => {
+    startCustomBtn.addEventListener('click', () => {
         const customTxt = customTextarea.value;
         if (customTxt.trim() !== "") {
             currentText = customTxt;
-            loadText(currentText);
+            currentTextId = ""; 
+            loadText(currentText, currentTextId);
             customTextContainer.classList.add('hidden');
         } else { alert("الرجاء إدخال نص للتدرب عليه."); }
     });
 
-    retryBtn.addEventListener('click', () => {
-        loadText(currentText);
-    });
+    retryBtn.addEventListener('click', () => loadText(currentText, currentTextId));
 
-    function loadText(text) {
+    function loadText(text, textId) {
         resetState();
+        if (textId && highScores[textId]) {
+            const score = highScores[textId];
+            bestWpmEl.textContent = score.wpm;
+            bestAccuracyEl.textContent = `${score.accuracy}%`;
+            highScoreDisplay.classList.remove('hidden');
+        }
         textDisplayEl.innerHTML = '';
         text.split('').forEach(char => {
             const charSpan = document.createElement('span');
@@ -203,9 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
         countdownTextEl.textContent = count;
         const countdownInterval = setInterval(() => {
             count--;
-            if (count > 0) {
-                countdownTextEl.textContent = count;
-            } else {
+            if (count > 0) { countdownTextEl.textContent = count; } 
+            else {
                 clearInterval(countdownInterval);
                 countdownOverlay.classList.add('hidden');
                 isTypingEnabled = true;
@@ -213,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
                    textDisplayEl.querySelectorAll('.char')[0].classList.add('active');
                 }
             }
-        }, 1000);
+        }, 800);
     }
 
     function resetState() {
@@ -223,14 +302,17 @@ document.addEventListener('DOMContentLoaded', () => {
         currentIndex = 0;
         correctChars = 0;
         totalTyped = 0;
+        errorLog = {};
         wpmEl.textContent = '0';
-        accuracyEl.textContent = '100';
+        accuracyEl.textContent = '100%';
         timerEl.textContent = '0';
         retryBtn.classList.add('hidden');
+        highScoreDisplay.classList.add('hidden');
+        errorAnalysisDisplay.classList.add('hidden');
     }
 
     function handleTyping(e) {
-        if (!isTypingEnabled || e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta' || e.key === 'Backspace') return;
+        if (!isTypingEnabled || e.key.length > 1 && e.key !== ' ') return;
         
         const charSpans = textDisplayEl.querySelectorAll('.char');
         if (currentIndex >= charSpans.length) return;
@@ -243,7 +325,8 @@ document.addEventListener('DOMContentLoaded', () => {
         charSpans[currentIndex].classList.remove('active');
         totalTyped++;
         
-        if (e.key === charSpans[currentIndex].innerText) {
+        const expectedChar = charSpans[currentIndex].innerText;
+        if (e.key === expectedChar) {
             charSpans[currentIndex].classList.add('correct');
             charSpans[currentIndex].classList.add('char-pop');
             setTimeout(() => {
@@ -252,15 +335,25 @@ document.addEventListener('DOMContentLoaded', () => {
             correctChars++;
         } else {
             charSpans[currentIndex].classList.add('incorrect');
+            errorLog[expectedChar] = (errorLog[expectedChar] || 0) + 1;
         }
 
         currentIndex++;
-        updateStats();
+        const finalStats = updateStats();
 
         if (currentIndex === charSpans.length) {
             isTypingEnabled = false;
             clearInterval(timerInterval);
             retryBtn.classList.remove('hidden');
+            
+            if (currentTextId) {
+                const currentBest = highScores[currentTextId] || { wpm: 0 };
+                if (finalStats.wpm > currentBest.wpm) {
+                    highScores[currentTextId] = { wpm: finalStats.wpm, accuracy: finalStats.accuracy };
+                    saveHighScores();
+                }
+            }
+            displayErrorAnalysis();
         } else {
             charSpans[currentIndex].classList.add('active');
         }
@@ -274,10 +367,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const wpm = minutes > 0 ? Math.round((correctChars / 5) / minutes) : 0;
         wpmEl.textContent = wpm;
         const accuracy = totalTyped > 0 ? Math.round((correctChars / totalTyped) * 100) : 100;
-        accuracyEl.textContent = accuracy;
+        accuracyEl.textContent = `${accuracy}%`;
+        return { wpm, accuracy };
+    }
+
+    function displayErrorAnalysis() {
+        const errors = Object.entries(errorLog).sort((a, b) => b[1] - a[1]);
+        if (errors.length > 0) {
+            errorListEl.innerHTML = '';
+            errors.slice(0, 5).forEach(([char, count]) => {
+                const charName = char === ' ' ? "'مسافة'" : `'${char}'`;
+                const errorItem = document.createElement('div');
+                errorItem.className = 'error-item';
+                errorItem.innerHTML = `<span class="char-name">${charName}</span>: ${count} أخطاء`;
+                errorListEl.appendChild(errorItem);
+            });
+            errorAnalysisDisplay.classList.remove('hidden');
+        }
     }
 });
 </script>
-
 </body>
 </html>
